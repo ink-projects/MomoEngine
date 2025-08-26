@@ -1,0 +1,13 @@
+# CMake
+/build*
+
+# vscode
+/.vscode
+/.vs
+/vsxmake2022
+/out
+
+# macOS
+.DS_Store
+# Windows
+Thumbs.db
