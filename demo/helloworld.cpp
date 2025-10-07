@@ -1,5 +1,7 @@
 #include <iostream>
 #include <Engine.h>
+#include "spdlog/spdlog.h"
+#include <GLFW/glfw3.h>
 
 /*int main(int argc, const char* argv[]) {
     std::cout << "Hello, World!\n";
@@ -19,7 +21,22 @@ void MyUpdateFunction() {
 int main() {
     Engine engine;
     engine.Startup();
-    engine.RunGameLoop(MyUpdateFunction);
+
+    engine.GetGraphics().LoadTexture("momo", "assets/textures/momo.jpg");
+
+    engine.RunGameLoop( [&]() {
+        auto& input = engine.GetInput();
+
+        if (input.KeyIsPressed(GLFW_KEY_SPACE)) {   //when spacebar is pressed
+            spdlog::info("Space is pressed!");
+        }
+
+        if (input.KeyIsPressed(GLFW_KEY_ESCAPE)) {  //when escape is pressed
+            spdlog::info("Escape pressed -- quitting engine...");
+            glfwSetWindowShouldClose(engine.GetGraphics().GetWindow(), true);
+        }
+    });
+
     engine.Shutdown();
     return 0;
 }

@@ -1,5 +1,4 @@
 #include "Engine.h"
-#include <iostream>
 #include "spdlog/spdlog.h"
 
 #define GLFW_INCLUDE_NONE
@@ -14,14 +13,17 @@ namespace momoengine {
         if (!success) {
             spdlog::error("Graphics startup failed");
         }
+
+        input.Startup(graphics.GetWindow());    //gives input manager access to a window
     }
 
     void Engine::Shutdown() {
+        input.Shutdown();
         graphics.Shutdown();
         spdlog::info("Engine shutting down.");
     }
 
-    void Engine::RunGameLoop(void (*UpdateCallback)()) {
+    void Engine::RunGameLoop(const UpdateCallback& callback) {
         auto* window = graphics.GetWindow();    //creates the window
         if (!window) {
             spdlog::error("RunGameLoop called with no valid window; Startup() may have failed.");
@@ -33,7 +35,7 @@ namespace momoengine {
         const double tickRate = 1.0 / 60.0;     //60 updates per second
 
         while (!glfwWindowShouldClose(window)) {    //while the window is open
-            glfwPollEvents();
+            input.Update();     //uses glfwPollEvents(), which polls input events
 
             double currentTime = glfwGetTime();     //current time in seconds
             double elapsedTime = currentTime - previousTime;    //calculates time passed between loops
@@ -44,13 +46,23 @@ namespace momoengine {
             //if the elapsed time has somehow surpassed the tick rate
             while (accumulatedTime >= tickRate) {
                 // InputManager::Update()
-                UpdateCallback();   //calls update function
+                callback();   //calls update function
                 accumulatedTime -= tickRate;
             }
 
             //GraphicsManager::Draw()
+            std::vector<Sprite> sprites;
+
+            Sprite s{};
+            s.texture_name = "momo";                 //names the loaded texture
+            s.position = glm::vec2(100, 100);        //centers the texture
+            s.scale = glm::vec2(200, 200);        //scaled normally
+            s.z = 0.5f;                             //right in the middle of the layer
+
+            sprites.push_back(s);
+
+            graphics.Draw(sprites);//draw to the screen
+            spdlog::info("Draw() called. Sprite count: {}", sprites.size());
         }
     }
-
-
 }
