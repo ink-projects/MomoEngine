@@ -1,0 +1,15 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/cmake_install.cmake",
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/glfw3-build/cmake_install.cmake",
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/glfw3-build/src/cmake_install.cmake",
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/spdlog-build/cmake_install.cmake",
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/glm-build/cmake_install.cmake",
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/glm-build/glm/cmake_install.cmake",
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/webgpu-build/cmake_install.cmake",
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/webgpu-build/dawn/cmake_install.cmake",
+		"C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/glfw3webgpu-build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

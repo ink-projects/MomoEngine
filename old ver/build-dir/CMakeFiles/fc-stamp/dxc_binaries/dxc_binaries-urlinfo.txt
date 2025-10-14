@@ -1,0 +1,12 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=url
+command=C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;C:/Users/Momo/Desktop/Momo Engine/build-dir/CMakeFiles/fc-stamp/dxc_binaries/download-dxc_binaries.cmake;COMMAND;C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;C:/Users/Momo/Desktop/Momo Engine/build-dir/CMakeFiles/fc-stamp/dxc_binaries/verify-dxc_binaries.cmake;COMMAND;C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;C:/Users/Momo/Desktop/Momo Engine/build-dir/CMakeFiles/fc-stamp/dxc_binaries/extract-dxc_binaries.cmake
+source_dir=C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dxc_binaries-src
+work_dir=C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps
+url(s)=https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2407/dxc_2024_07_18.zip
+hash=
+      no_extract=
+

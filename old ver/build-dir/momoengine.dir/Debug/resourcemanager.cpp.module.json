@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "momoengine.dir\\Debug\\ResourceManager.obj",
+            "outputs": [
+                "C:\\Users\\Momo\\Desktop\\Momo Engine\\build-dir\\Debug\\momoengine.pdb",
+                "momoengine.dir\\Debug\\"
+            ],
+            "requires": []
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+# This is a generated file and its contents are an internal implementation detail.
+# The download step will be re-executed if anything in this file changes.
+# No other meaning or use of this file is supported.
+
+method=url
+command=C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dawn-7187-windows-x64-release-subbuild/dawn-7187-windows-x64-release-populate-prefix/src/dawn-7187-windows-x64-release-populate-stamp/download-dawn-7187-windows-x64-release-populate.cmake;COMMAND;C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dawn-7187-windows-x64-release-subbuild/dawn-7187-windows-x64-release-populate-prefix/src/dawn-7187-windows-x64-release-populate-stamp/verify-dawn-7187-windows-x64-release-populate.cmake;COMMAND;C:/Program Files/CMake/bin/cmake.exe;-DCMAKE_MESSAGE_LOG_LEVEL=VERBOSE;-P;C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dawn-7187-windows-x64-release-subbuild/dawn-7187-windows-x64-release-populate-prefix/src/dawn-7187-windows-x64-release-populate-stamp/extract-dawn-7187-windows-x64-release-populate.cmake
+source_dir=C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dawn-7187-windows-x64-release-src
+work_dir=C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps
+url(s)=https://github.com/eliemichel/dawn-prebuilt/releases/download/chromium%2F7187/Dawn-7187-windows-x64-Release.zip
+hash=
+      no_extract=
+

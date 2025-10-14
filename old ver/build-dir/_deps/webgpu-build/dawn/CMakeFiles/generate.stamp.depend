@@ -1,0 +1,10 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.1/Modules/ExternalProject/shared_internal_commands.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/FetchContent.cmake
+C:/Program Files/CMake/share/cmake-4.1/Modules/FetchContent/CMakeLists.cmake.in
+C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dawn-7187-windows-x64-release-src/lib/cmake/Dawn/DawnConfig.cmake
+C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dawn-7187-windows-x64-release-src/lib/cmake/Dawn/DawnConfigVersion.cmake
+C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dawn-7187-windows-x64-release-src/lib/cmake/Dawn/DawnTargets-release.cmake
+C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/dawn-7187-windows-x64-release-src/lib/cmake/Dawn/DawnTargets.cmake
+C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/webgpu-src/dawn/CMakeLists.txt
+C:/Users/Momo/Desktop/Momo Engine/build-dir/_deps/webgpu-src/dawn/FetchDawnPrecompiled.cmake
