@@ -41,10 +41,10 @@ namespace momoengine {
         float u, v;
     } vertices[] = {
         // position       // texcoords
-        { 0.0f, 0.0f, 0.0f, 1.0f },
-        { 1.0f, 0.0f, 1.0f, 1.0f },
-        { 0.0f, 1.0f, 0.0f, 0.0f },
-        { 1.0f, 1.0f, 1.0f, 0.0f },
+        { -0.5f, -0.5f, 0.0f, 1.0f },
+        {  0.5f, -0.5f, 1.0f, 1.0f },
+        { -0.5f,  0.5f, 0.0f, 0.0f },
+        {  0.5f,  0.5f, 1.0f, 0.0f },
     };
 
     bool GraphicsManager::Startup(int window_width, int window_height, const char* window_name, bool fullscreen) {
@@ -514,7 +514,6 @@ namespace momoengine {
                 s.position.x, s.position.y, s.scale.x, s.scale.y);
         }
 
-
         glm::mat4 projection = glm::ortho(0.0f, float(width), float(height), 0.0f, -1.0f, 1.0f);
         Uniforms uniforms{ projection };
         wgpuQueueWriteBuffer(queue, uniformBuffer, 0, &uniforms, sizeof(Uniforms));
@@ -527,9 +526,12 @@ namespace momoengine {
 
         //sort sprites back to front by z value
         std::vector<std::pair<Sprite, size_t>> sorted_sprites;
+        sorted_sprites.reserve(sprites.size());     //pre-allocates memory for the vector
+        
         for (size_t i = 0; i < sprites.size(); ++i) {
             sorted_sprites.emplace_back(sprites[i], i);
         }
+
         std::sort(sorted_sprites.begin(), sorted_sprites.end(),
             [](const auto& a, const auto& b) { return a.first.z < b.first.z; });
 
@@ -537,18 +539,12 @@ namespace momoengine {
         std::vector<InstanceData> instances(sprites.size());
         for (size_t i = 0; i < sorted_sprites.size(); ++i) {
             const Sprite& s = sorted_sprites[i].first;
-
             glm::vec2 finalScale = s.scale;
+
             const auto it = textures.find(s.texture_name);
             if (it != textures.end()) {
                 const Texture& tex = it->second;
-                finalScale = s.scale;
-                //if (tex.width < tex.height) {
-                //    finalScale *= glm::vec2(float(tex.width) / tex.height, 1.0f);
-                //}
-                //else {
-                //    finalScale *= glm::vec2(1.0f, float(tex.height) / tex.width);
-                //}
+                //finalScale = s.scale;
             }
 
             instances[i] = {
@@ -557,51 +553,70 @@ namespace momoengine {
             };
         }
 
-        instanceBuffer = wgpuDeviceCreateBuffer(device, to_ptr(WGPUBufferDescriptor{
-            .label = WGPUStringView("Instance Buffer", WGPU_STRLEN),
-            .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex,
-            .size = sizeof(InstanceData) * instances.size()
+        instanceBuffer = wgpuDeviceCreateBuffer(
+            device, 
+            to_ptr(WGPUBufferDescriptor{
+                .label = WGPUStringView("Instance Buffer", WGPU_STRLEN),
+                .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex,
+                .size = sizeof(InstanceData) * instances.size()
             }));
+
         wgpuQueueWriteBuffer(queue, instanceBuffer, 0, instances.data(), sizeof(InstanceData) * instances.size());
 
         //set instance buffer (slot 1)
-        wgpuRenderPassEncoderSetVertexBuffer(render_pass, 1, instanceBuffer, 0, sizeof(InstanceData) * instances.size());
+        wgpuRenderPassEncoderSetVertexBuffer(render_pass, 1, instanceBuffer, 0, sizeof(InstanceData));   //changed from sizeof(InstanceData) * instances.size()
 
         //draw sprites
-        std::string lastTexture = "";
+        //std::string lastTexture = "";
         const Sprite& s0 = sorted_sprites[0].first;
+
+        if (!textures.contains(s0.texture_name)) {
+            spdlog::error("Sprite references missing texture '{}'", s0.texture_name);
+            //end pass
+            wgpuRenderPassEncoderEnd(render_pass);
+            wgpuTextureViewRelease(current_texture_view);
+            wgpuTextureRelease(surface_texture.texture);
+            wgpuCommandEncoderRelease(encoder);
+            return;
+        }
+
         const Texture& tex = textures[s0.texture_name];
 
         WGPUBindGroupLayout layout = wgpuRenderPipelineGetBindGroupLayout(pipeline, 0);
-        WGPUBindGroup bindGroup = wgpuDeviceCreateBindGroup(device, to_ptr(WGPUBindGroupDescriptor{
-            .layout = layout,
-            .entryCount = 3,
-            .entries = to_ptr<WGPUBindGroupEntry>({
-                {.binding = 0, .buffer = uniformBuffer, .size = sizeof(Uniforms)},
-                {.binding = 1, .sampler = tex.sampler},
-                {.binding = 2, .textureView = tex.view}
-            })
+        WGPUBindGroup bindGroup = wgpuDeviceCreateBindGroup(
+            device, 
+            to_ptr(WGPUBindGroupDescriptor{
+                .layout = layout,
+                .entryCount = 3,
+                .entries = to_ptr<WGPUBindGroupEntry>({
+                    {.binding = 0, .buffer = uniformBuffer, .size = sizeof(Uniforms)},
+                    {.binding = 1, .sampler = tex.sampler},
+                    {.binding = 2, .textureView = tex.view}
+                })
             }));
+
         wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bindGroup, 0, nullptr);
         wgpuBindGroupLayoutRelease(layout);
 
         //draw all instances at once
-        wgpuRenderPassEncoderDraw(render_pass, 4, sorted_sprites.size(), 0, 0);
+        wgpuRenderPassEncoderDraw(render_pass, 4, static_cast<uint32_t>(sorted_sprites.size()), 0, 0);
 
         //end render pass
         wgpuRenderPassEncoderEnd(render_pass);
 
+        //cleanup bind group
+        wgpuBindGroupRelease(bindGroup);
+
         //submit command buffer
         WGPUCommandBuffer commandBuffer = wgpuCommandEncoderFinish(encoder, nullptr);
-        wgpuQueueSubmit(queue, 1, &commandBuffer);
 
         //testing
         spdlog::info("Submitting draw command buffer...");
-        wgpuQueueSubmit(queue, 1, &commandBuffer);
-        spdlog::info("Draw submitted.");
         if (!commandBuffer) {
             spdlog::error("Command buffer was null before submit!");
         }
+
+        wgpuQueueSubmit(queue, 1, &commandBuffer);
 
         //present the frame
         wgpuSurfacePresent(surface);
