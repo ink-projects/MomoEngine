@@ -15,12 +15,23 @@ namespace momoengine {
         }
 
         input.Startup(graphics.GetWindow());    //gives input manager access to a window
+
+        scripts.Startup(this, &input, &graphics);
     }
 
     void Engine::Shutdown() {
+        scripts.Shutdown();
         input.Shutdown();
         graphics.Shutdown();
         spdlog::info("Engine shutting down.");
+    }
+
+    void Engine::Quit() {
+        auto* window = graphics.GetWindow();
+        if (window) {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+            spdlog::info("Quit requested by script.");
+        }
     }
 
     void Engine::RunGameLoop(const UpdateCallback& callback) {
@@ -49,8 +60,6 @@ namespace momoengine {
                 callback();   //calls update function
                 accumulatedTime -= tickRate;
             }
-
-            //GraphicsManager::Draw()
         }
     }
 
