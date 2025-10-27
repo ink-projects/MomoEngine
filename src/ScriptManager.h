@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <sol/sol.hpp>
 
+#include "EntityManager.h"
+
 namespace momoengine {
 	//to avoid circular dependencies
 	class Engine;
@@ -15,6 +17,8 @@ namespace momoengine {
 		void Shutdown();
 		bool LoadScript(const std::string& name, const std::string& path);
 		bool RunScript(const std::string& name);
+
+		void Update(class EntityManager& entities);
 
 		sol::state& GetLua() { return lua; }
 

@@ -2,6 +2,7 @@
 #include "GraphicsManager.h"
 #include "InputManager.h"
 #include "ScriptManager.h"
+#include "EntityManager.h"
 #include <functional>
 
 namespace momoengine {
@@ -18,10 +19,12 @@ namespace momoengine {
         InputManager& GetInput() { return input; }
         GraphicsManager& GetGraphics() { return graphics; }
         ScriptManager& GetScripts() { return scripts;  }
+        EntityManager& GetEntityManager() { return entities; }
     
     private:
         GraphicsManager graphics;   //adds GraphicsManager window
         InputManager input;          //grabs keyboard/mouse input
         ScriptManager scripts;
+        EntityManager entities;
     };
 }

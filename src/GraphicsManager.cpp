@@ -3,6 +3,8 @@
 #include <glfw3webgpu.h>
 
 #include "GraphicsManager.h"
+#include "EntityManager.h"
+#include "Types.h"
 #include "spdlog/spdlog.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -381,8 +383,9 @@ namespace momoengine {
         return true;
     }
 
-    void GraphicsManager::Draw(const std::vector<Sprite>& sprites) {
-        if (sprites.empty()) return;
+    //void GraphicsManager::Draw(const std::vector<Sprite>& sprites) { --old version
+    void GraphicsManager::Draw(EntityManager& entities) {
+        //if (sprites.empty()) return;  --old version
 
         //create projection matrix
         Uniforms uniforms;
@@ -407,43 +410,67 @@ namespace momoengine {
         wgpuQueueWriteBuffer(queue, uniform_buffer, 0, &uniforms, sizeof(Uniforms));
 
         //sort the sprites from back to front
-        std::vector<Sprite> sorted = sprites;
-        std::sort(sorted.begin(), sorted.end(),
-            [](const Sprite& a, const Sprite& b) { return a.z < b.z; });
+        //std::vector<Sprite> sorted = sprites;     --old version
+        //std::sort(sorted.begin(), sorted.end(),
+        //    [](const Sprite& a, const Sprite& b) { return a.z < b.z; });
+
+        ////upload instance data
+        //std::vector<InstanceData> instances(sorted.size());
+        //for (size_t i = 0; i < sorted.size(); ++i) {
+        //    //instances[i].translation = glm::vec3(0.0f, 0.0f, 0.0f);
+        //    //instances[i].scale = glm::vec2(0.25f, 0.25f);
+
+        //    instances[i].translation = sorted[i].position;  //set the translation
+
+        //    //computes the scale of the sprite based on aspect ratio
+        //    if (sorted[i].width < sorted[i].height) {
+        //        instances[i].scale = glm::vec2(
+        //            static_cast<float>(sorted[i].width) / sorted[i].height *0.25f,  //shrinks so it isn't too big
+        //            0.25f
+        //        );
+        //    }
+        //    else {
+        //        instances[i].scale = glm::vec2(
+        //            0.25f,
+        //            static_cast<float>(sorted[i].height) / sorted[i].width * 0.25f
+        //        );
+        //    }
+        //}
+
+        ////instance buffer to fill
+        //instance_buffer = wgpuDeviceCreateBuffer(device, to_ptr<WGPUBufferDescriptor>({
+        //    .label = WGPUStringView("Instance Buffer", WGPU_STRLEN),
+        //    .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex,
+        //    .size = sizeof(InstanceData) * instances.size()
+        //}));
+        //if (instances.size() > 0) {
+        //    wgpuQueueWriteBuffer(queue, instance_buffer, 0,
+        //        instances.data(), sizeof(InstanceData) * instances.size());
+        //}
+
+        //new version
+        //get instance data from EntityManager
+        std::vector<InstanceData> instances;
+
+        entities.ForEach<Sprite, Position>([&](EntityManager::Entity id, Sprite& sprite, Position& pos) {
+            InstanceData data{};
+            data.translation = glm::vec3(pos.x, pos.y, 0.0f);
+
+            //simple uniform scale
+            data.scale = glm::vec2(0.25f, 0.25f);
+
+            instances.push_back(data);
+            });
+
+        if (instances.empty()) return;
 
         //upload instance data
-        std::vector<InstanceData> instances(sorted.size());
-        for (size_t i = 0; i < sorted.size(); ++i) {
-            //instances[i].translation = glm::vec3(0.0f, 0.0f, 0.0f);
-            //instances[i].scale = glm::vec2(0.25f, 0.25f);
-
-            instances[i].translation = sorted[i].position;  //set the translation
-
-            //computes the scale of the sprite based on aspect ratio
-            if (sorted[i].width < sorted[i].height) {
-                instances[i].scale = glm::vec2(
-                    static_cast<float>(sorted[i].width) / sorted[i].height *0.25f,  //shrinks so it isn't too big
-                    0.25f
-                );
-            }
-            else {
-                instances[i].scale = glm::vec2(
-                    0.25f,
-                    static_cast<float>(sorted[i].height) / sorted[i].width * 0.25f
-                );
-            }
-        }
-
-        //instance buffer to fill
         instance_buffer = wgpuDeviceCreateBuffer(device, to_ptr<WGPUBufferDescriptor>({
             .label = WGPUStringView("Instance Buffer", WGPU_STRLEN),
             .usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex,
             .size = sizeof(InstanceData) * instances.size()
         }));
-        if (instances.size() > 0) {
-            wgpuQueueWriteBuffer(queue, instance_buffer, 0,
-                instances.data(), sizeof(InstanceData) * instances.size());
-        }
+        wgpuQueueWriteBuffer(queue, instance_buffer, 0, instances.data(), sizeof(InstanceData) * instances.size());
 
         //create command encoder
         WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, nullptr);
@@ -480,7 +507,7 @@ namespace momoengine {
         wgpuRenderPassEncoderSetBindGroup(render_pass, 0, bind_group, 0, nullptr);
 
         //draw the sprites
-        for (size_t i = 0; i < sorted.size(); ++i) {
+        for (size_t i = 0; i < instances.size(); ++i) {
             wgpuRenderPassEncoderDraw(render_pass, 4, 1, 0, i);
         }
 

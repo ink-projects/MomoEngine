@@ -102,6 +102,7 @@ add_library( momoengine STATIC
     src/InputManager.cpp
     src/ResourceManager.cpp
     src/ScriptManager.cpp
+    src/EntityManager.cpp
     )
 set_target_properties( momoengine PROPERTIES CXX_STANDARD 20 )
 

@@ -6,6 +6,8 @@
 #include "Engine.h"
 #include "InputManager.h"
 #include "GraphicsManager.h"
+#include "EntityManager.h"
+#include "Types.h"
 
 #include "spdlog/spdlog.h"
 #include <GLFW/glfw3.h>
@@ -154,6 +156,32 @@ bool ScriptManager::RunScript(const std::string& name) {
 		return false;
 	}
 	return true;
+}
+
+void ScriptManager::Update(EntityManager& entities) {
+	//iterate over all entities using Script component
+	entities.ForEach<Script>([&](EntityManager::Entity id, Script& script) {
+		auto it = scripts.find(script.name);
+		if (it == scripts.end()) {
+			spdlog::error("Entity {} has script '{}' that is not loaded.", id, script.name);
+			return;
+		}
+
+		//set a global entity variable for current entity
+		lua["entity"] = id;
+
+		sol::function updateFunc = lua["Update"];
+		if (updateFunc.valid()) {
+			sol::protected_function_result result = updateFunc();
+
+			if (!result.valid()) {
+				sol::error err = result;
+				spdlog::error("Lua error in Update() for entity {}: {}", id, err.what());
+			}
+		} else {
+			spdlog::error("Script '{}' has no Update() function", script.name);
+		}
+	});
 }
 
 void ScriptManager::Shutdown() {

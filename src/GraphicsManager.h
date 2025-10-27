@@ -7,6 +7,7 @@ struct GLFWwindow;
 #include <string>
 
 #include "Sprite.h" //so we can work with sprites
+#include "EntityManager.h"  //for working with components
 
 namespace momoengine {
 
@@ -15,7 +16,8 @@ namespace momoengine {
         bool Startup(int window_width, int window_height, const char* window_name, bool fullscreen);
         void Shutdown();
         bool LoadTexture(const std::string& name, const std::string& path);
-        void Draw(const std::vector<Sprite>& sprites);
+        void Draw(EntityManager& entities);
+        //void Draw(const std::vector<Sprite>& sprites); --old version
 
         GLFWwindow* GetWindow() const { return window; }
 
