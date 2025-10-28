@@ -116,6 +116,26 @@ bool ScriptManager::Startup(Engine* eng, InputManager* inputMgr, GraphicsManager
 	);
 
 	spdlog::info("Sprite exposed to Lua.");
+
+	lua.new_usertype<Position>("Position",
+		sol::constructors<Position(), Position(float, float)>(),
+		"x", &Position::x,
+		"y", &Position::y
+	);
+	spdlog::info("Sprite Position exposed to Lua.");
+
+	//GetComponent<T> and AddComponent<T> wrappers
+	lua.set_function("GetPosition", [&](int entity) -> Position& {
+		return engine->GetEntityManager().GetComponent<Position>(entity);
+		});
+
+	lua.set_function("SetPosition", [&](int entity, float x, float y) {
+		Position& pos = engine->GetEntityManager().GetComponent<Position>(entity);
+		pos.x = x;
+		pos.y = y;
+		});
+
+
 	return true;
 }
 
